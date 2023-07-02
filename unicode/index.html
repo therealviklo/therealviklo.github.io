@@ -12,11 +12,44 @@
 			}
 		</style>
 		<script>
+			const textPlaceholder = "Exempel";
+			const unicodePlaceholder = "U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C";
+
+			function placeholderCheck(text, unicode)
+			{
+				if (text.value.length == 0 && unicode.value.length == 0)
+				{
+					text.placeholder = textPlaceholder;
+					unicode.placeholder = unicodePlaceholder;
+				}
+				else
+				{
+					text.placeholder = "";
+					unicode.placeholder = "";
+				}
+			}
+
+			function padWithZeroes(str, num)
+			{
+				if (str.length < num)
+					return "0".repeat(num - str.length) + str;
+				return str;
+			}
+
 			function textChanged()
 			{
 				const text = document.getElementById("text");
 				const unicode = document.getElementById("unicode");
 				const textString = text.value;
+				let newUnicode = "";
+				for (const codePoint of textString)
+				{
+					if (newUnicode != "")
+						newUnicode += " ";
+					newUnicode += "U+" + padWithZeroes(codePoint.codePointAt(0).toString(16).toUpperCase(), 4);
+				}
+				unicode.value = newUnicode;
+				placeholderCheck(text, unicode);
 			}
 
 			function unicodeChanged()
@@ -35,6 +68,7 @@
 					}
 				});
 				text.value = newText;
+				placeholderCheck(text, unicode);
 			}
 		</script>
 	</head>
@@ -45,7 +79,7 @@
 			<h2>Text</h2>
 			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Exempel"></textarea>
 			<h2>Unicodekodpunkter</h2>
-			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder=""></textarea>
+			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder="U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C"></textarea>
 		</div>
 	</body>
 </html>
