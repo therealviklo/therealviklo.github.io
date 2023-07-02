@@ -2,10 +2,50 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Viklos sida</title>
+		<title>Unicodeanalyserare</title>
 		<link rel="stylesheet" href="/style.css">
+		<style>
+			textarea
+			{
+				width: 100%;
+				box-sizing: border-box;
+			}
+		</style>
+		<script>
+			function textChanged()
+			{
+				const text = document.getElementById("text");
+				const unicode = document.getElementById("unicode");
+				const textString = text.value;
+			}
+
+			function unicodeChanged()
+			{
+				const text = document.getElementById("text");
+				const unicode = document.getElementById("unicode");
+				const sanitisedUnicode = unicode.value.replace(/[^U+0-9A-Fa-f ]/g, "");
+				unicode.value = sanitisedUnicode;
+				const nums = sanitisedUnicode.replace(/[U+]/g, "").split(" ");
+				let newText = "";
+				nums.forEach(i => {
+					if (i != "")
+					{
+						let num = parseInt(i, 16);
+						newText += String.fromCodePoint(num);
+					}
+				});
+				text.value = newText;
+			}
+		</script>
 	</head>
 	<body>
 		<iframe src="/header.html" id="header"></iframe>
+		<div class="block">
+			<h1>Unicodeanalyserare</h1>
+			<h2>Text</h2>
+			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Exempel"></textarea>
+			<h2>Unicodekodpunkter</h2>
+			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder=""></textarea>
+		</div>
 	</body>
 </html>
