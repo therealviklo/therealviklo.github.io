@@ -56,9 +56,9 @@
 			{
 				const text = document.getElementById("text");
 				const unicode = document.getElementById("unicode");
-				const sanitisedUnicode = unicode.value.replace(/[^U+0-9A-Fa-f\s]/g, "");
+				const sanitisedUnicode = unicode.value.replace(/[^Uu+0-9A-Fa-f\s]/g, "");
 				unicode.value = sanitisedUnicode;
-				const nums = sanitisedUnicode.replace(/[U+]/g, "").split(/\s/g);
+				const nums = sanitisedUnicode.replace(/[Uu+]/g, "").split(/\s/g);
 				let newText = "";
 				nums.forEach(i => {
 					if (i != "")
