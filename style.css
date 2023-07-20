@@ -13,6 +13,21 @@ h1
 	text-align: center;
 }
 
+a
+{
+	color: white;
+}
+
+a:hover
+{
+	color: lightblue;
+}
+
+a:active
+{
+	color: #9F14CD;
+}
+
 textarea
 {
 	background-color: #1a1a1a;
