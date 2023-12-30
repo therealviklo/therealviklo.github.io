@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="icon" type="image/png" href="/favicon.png">
-		<title>Unicodeanalysator</title>
+		<title>Unicode analyser</title>
 		<link rel="stylesheet" href="/style.css">
 
 		<style>
@@ -15,8 +15,8 @@
 			}
 		</style>
 		<script>
-			const textPlaceholder = "Exempel";
-			const unicodePlaceholder = "U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C";
+			let textPlaceholder = "Example";
+			let unicodePlaceholder = "U+0045 U+0078 U+0061 U+006D U+0070 U+006C U+0065";
 
 			function placeholderCheck(text, unicode)
 			{
@@ -73,16 +73,35 @@
 				text.value = newText;
 				placeholderCheck(text, unicode);
 			}
+
+			function switchLanguage()
+			{
+				document.title = "Unicodeanalysator";
+				const $$ = document.getElementById;
+				$$("mainTitle") = "Unicodeanalysator";
+				$$("unicodeTitle") = "Unicodekodpunkter";
+				textPlaceholder = "Exempel";
+				unicodePlaceholder = "U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C";
+				unicodeChanged();
+			}
+
+			function checkLanguage()
+			{
+				if (navigator.language.startsWith("sv-") || navigator.language == "sv")
+				{
+					switchLanguage();
+				}
+			}
 		</script>
 	</head>
-	<body>
+	<body onload="checkLanguage();">
 		<iframe src="/header.html" id="header"></iframe>
 		<div class="block">
-			<h1>Unicodeanalysator</h1>
-			<h2>Text</h2>
-			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Exempel"></textarea>
-			<h2>Unicodekodpunkter</h2>
-			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder="U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C"></textarea>
+			<h1 id="mainTitle">Unicode analyser</h1>
+			<h2 id="textTitle">Text</h2>
+			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Example"></textarea>
+			<h2 id="unicodeTitle">Unicode code points</h2>
+			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder="U+0045 U+0078 U+0061 U+006D U+0070 U+006C U+0065"></textarea>
 		</div>
 	</body>
 </html>
