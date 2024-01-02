@@ -77,9 +77,9 @@
 			function switchLanguage()
 			{
 				document.title = "Unicodeanalysator";
-				const $$ = document.getElementById;
-				$$("mainTitle") = "Unicodeanalysator";
-				$$("unicodeTitle") = "Unicodekodpunkter";
+				document.getElementById("mainTitle").innerText = "Unicodeanalysator";
+				document.getElementById("unicodeTitle").innerText = "Unicodekodpunkter";
+				document.getElementById("explanation").innerText = "Textrutan under \"Unicodekodpunkter\" visar Unicodekodpunkterna för texten i textrutan under \"Text\". Båda textrutorna kan ändras, vilket också får den andra textrutan att uppdatera.";
 				textPlaceholder = "Exempel";
 				unicodePlaceholder = "U+0045 U+0078 U+0065 U+006D U+0070 U+0065 U+006C";
 				unicodeChanged();
@@ -98,6 +98,7 @@
 		<iframe src="/header.html" id="header"></iframe>
 		<div class="block">
 			<h1 id="mainTitle">Unicode analyser</h1>
+			<p id="explanation">The box labelled "Unicode" displays the Unicode code points of the text in the box labelled "Text". Editing either box will cause the other to update.</p>
 			<h2 id="textTitle">Text</h2>
 			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Example"></textarea>
 			<h2 id="unicodeTitle">Unicode code points</h2>
