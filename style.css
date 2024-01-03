@@ -20,12 +20,12 @@ a
 
 a:hover
 {
-	color: lightblue;
+	color: #5ea4ff;
 }
 
 a:active
 {
-	color: #9F14CD;
+	color: #4950dd;
 }
 
 textarea
