@@ -14,10 +14,36 @@
 				box-sizing: border-box;
 				height: 5.5rem;
 			}
+
+			#charinfo div
+			{
+				display: flex;
+				height: 1.1666666em;
+			}
+
+			.charDisplay
+			{
+				display: inline-block;
+				width: 1.5em;
+				text-align: center;
+				overflow: hidden;
+			}
+
+			.charCode
+			{
+				display: inline-block;
+				width: 5em;
+			}
+
+			.charFormalalias
+			{
+				font-style: italic;
+			}
 		</style>
 		<script>
 			let textPlaceholder = "Example";
 			let unicodePlaceholder = "U+0045 U+0078 U+0061 U+006D U+0070 U+006C U+0065";
+			let namesList = null;
 
 			function placeholderCheck(text, unicode)
 			{
@@ -40,6 +66,11 @@
 				return str;
 			}
 
+			function codePointHexcode(codePoint)
+			{
+				return padWithZeroes(codePoint.codePointAt(0).toString(16).toUpperCase(), 4);
+			}
+
 			function textChanged()
 			{
 				const text = document.getElementById("text");
@@ -50,10 +81,11 @@
 				{
 					if (newUnicode != "")
 						newUnicode += " ";
-					newUnicode += "U+" + padWithZeroes(codePoint.codePointAt(0).toString(16).toUpperCase(), 4);
+					newUnicode += "U+" + codePointHexcode(codePoint);
 				}
 				unicode.value = newUnicode;
 				placeholderCheck(text, unicode);
+				generateInfoList();
 			}
 
 			function unicodeChanged()
@@ -73,6 +105,7 @@
 				});
 				text.value = newText;
 				placeholderCheck(text, unicode);
+				generateInfoList();
 			}
 
 			function switchLanguage()
@@ -94,7 +127,113 @@
 				}
 			}
 
+			function generateInfoList()
+			{
+				if (namesList)
+				{
+					const charinfo = document.getElementById("charinfo");
+					charinfo.textContent = "";
+					const text = document.getElementById("text").value;
+					for (const c of text)
+					{
+						const element = document.createElement("div");
+						const charDisplay = document.createElement("span");
+						charDisplay.setAttribute("class", "charDisplay");
+						charDisplay.appendChild(document.createTextNode(c));
+						element.appendChild(charDisplay);
+						const charCode = document.createElement("span");
+						charCode.setAttribute("class", "charCode");
+						charCode.appendChild(document.createTextNode("U+" + codePointHexcode(c)));
+						element.appendChild(charCode);
+						const ci = namesList[c.codePointAt(0)];
+						if (ci)
+						{
+							const charName = document.createElement("span");
+							charName.setAttribute("class", "charName");
+							charName.appendChild(document.createTextNode(ci["name"]));
+							if (ci["formalaliases"].length > 0)
+							{
+								const charFormalalias = document.createElement("span");
+								charFormalalias.setAttribute("class", "charFormalalias");
+								charFormalalias.appendChild(document.createTextNode(
+									" (" + ci["formalaliases"][ci["formalaliases"].length - 1] + ")"
+								));
+								charName.appendChild(charFormalalias);
+							}
+							element.appendChild(charName);
+						}
+						charinfo.appendChild(element);
+					}
+					document.getElementById("charinfoSection").hidden = text.length == 0;
+				}
+			}
+
+			function loadNamesList()
+			{
+				fetch("/unicode/NamesList.txt").then(value => value.text().then(value => {
+					let namesListTmp = {};
+					const matches = value.matchAll(/^[^;@].*$/gm);
+					let currCharCode = null;
+					for (const i of matches)
+					{
+						let match = i[0].match(/^[0-9A-F]{4,}\s+.+$/g)
+						if (match)
+						{
+							let iter = match[0].matchAll(/[^\t]+/g);
+							currCharCode = parseInt(iter.next().value[0], 16);
+							const name = iter.next().value[0];
+							namesListTmp[currCharCode] = {
+								"name": name,
+								"comments": [],
+								"aliases": [],
+								"formalaliases": [],
+								"crossrefs": [],
+								"variations": [],
+								"decompositions": [],
+								"compatmapping": []
+							};
+							continue;
+						}
+						if (!currCharCode)
+							continue;
+						match = i[0].match(/(?<=^\s*)[*=%x~:#] .+$/g);
+						if (match)
+						{
+							const text = match[0].substr(2);
+							switch (match[0][0])
+							{
+								case '*':
+									namesListTmp[currCharCode].comments.push(text);
+									break;
+								case '=':
+									namesListTmp[currCharCode].aliases.push(text);
+									break;
+								case '%':
+									namesListTmp[currCharCode].formalaliases.push(text);
+									break;
+								case 'x':
+									namesListTmp[currCharCode].crossrefs.push(text);
+									break;
+								case '~':
+									namesListTmp[currCharCode].variations.push(text);
+									break;
+								case ':':
+									namesListTmp[currCharCode].decompositions.push(text);
+									break;
+								case '#':
+									namesListTmp[currCharCode].compatmapping.push(text);
+									break;
+							}
+							continue;
+						}
+					}
+					namesList = namesListTmp;
+					generateInfoList();
+				}));
+			}
+
 			document.addEventListener("DOMContentLoaded", event => checkLanguage());
+			document.addEventListener("DOMContentLoaded", event => loadNamesList());
 		</script>
 	</head>
 	<body>
@@ -106,6 +245,10 @@
 			<textarea rows="5" id="text" oninput="textChanged()" placeholder="Example"></textarea>
 			<h2 id="unicodeTitle">Unicode code points</h2>
 			<textarea rows="5" id="unicode" oninput="unicodeChanged()" placeholder="U+0045 U+0078 U+0061 U+006D U+0070 U+006C U+0065"></textarea>
+			<div id="charinfoSection" hidden>
+				<h2>Character Info</h2>
+				<div id="charinfo"></div>
+			</div>
 		</div>
 	</body>
 </html>
