@@ -15,12 +15,14 @@
 				height: 5.5rem;
 			}
 
-			#charinfo div
+			.toprow
 			{
 				display: flex;
+				width: 100%;
+				cursor: pointer;
 			}
 
-			.charDisplay
+			.toprowDisplay
 			{
 				display: inline-block;
 				width: 1.5em;
@@ -30,16 +32,29 @@
 				flex-shrink: 0;
 			}
 
-			.charCode
+			.toprowCode
 			{
 				display: inline-block;
 				width: 5em;
 				flex-shrink: 0;
 			}
 
-			.charFormalalias
+			.toprowFormalalias
 			{
 				font-style: italic;
+			}
+
+			.moreInfoFlexbox
+			{
+				display: flex;
+			}
+
+			.moreInfoDisplay
+			{
+				width: 6.5rem;
+				font-size: 125%;
+				text-align: center;
+				flex-shrink: 0;
 			}
 		</style>
 		<script>
@@ -129,6 +144,14 @@
 				}
 			}
 
+			function expandCharinfo(div)
+			{
+				const moreInfos = div.getElementsByClassName("moreInfo");
+				if (moreInfos.length == 0) return;
+				const moreInfo = moreInfos[0];
+				moreInfo.hidden = !moreInfo.hidden;
+			}
+
 			function generateInfoList()
 			{
 				if (namesList)
@@ -138,32 +161,69 @@
 					const text = document.getElementById("text").value;
 					for (const c of text)
 					{
-						const element = document.createElement("div");
-						const charDisplay = document.createElement("span");
-						charDisplay.setAttribute("class", "charDisplay");
-						charDisplay.appendChild(document.createTextNode(c));
-						element.appendChild(charDisplay);
-						const charCode = document.createElement("span");
-						charCode.setAttribute("class", "charCode");
-						charCode.appendChild(document.createTextNode("U+" + codePointHexcode(c)));
-						element.appendChild(charCode);
 						const ci = namesList[c.codePointAt(0)];
+						const element = document.createElement("div");
+						element.setAttribute("class", "charEntry");
+						const toprowDiv = document.createElement("div");
+						toprowDiv.setAttribute("class", "toprowDiv");
+						const toprow = document.createElement("a");
+						toprow.setAttribute("class", "toprow");
+						toprow.setAttribute("onclick", "expandCharinfo(this.parentNode.parentNode)");
+						const toprowDisplay = document.createElement("span");
+						toprowDisplay.setAttribute("class", "toprowDisplay");
+						toprowDisplay.appendChild(document.createTextNode(c));
+						toprow.appendChild(toprowDisplay);
+						const toprowCode = document.createElement("span");
+						toprowCode.setAttribute("class", "toprowCode");
+						toprowCode.appendChild(document.createTextNode("U+" + codePointHexcode(c)));
+						toprow.appendChild(toprowCode);
 						if (ci)
 						{
-							const charName = document.createElement("span");
-							charName.setAttribute("class", "charName");
-							charName.appendChild(document.createTextNode(ci["name"]));
+							const toprowName = document.createElement("span");
+							toprowName.setAttribute("class", "toprowName");
+							toprowName.appendChild(document.createTextNode(ci["name"]));
 							if (ci["formalaliases"].length > 0)
 							{
-								const charFormalalias = document.createElement("span");
-								charFormalalias.setAttribute("class", "charFormalalias");
-								charFormalalias.appendChild(document.createTextNode(
+								const toprowFormalalias = document.createElement("span");
+								toprowFormalalias.setAttribute("class", "toprowFormalalias");
+								toprowFormalalias.setAttribute("title", "Formal alias");
+								toprowFormalalias.appendChild(document.createTextNode(
 									" (" + ci["formalaliases"][ci["formalaliases"].length - 1] + ")"
 								));
-								charName.appendChild(charFormalalias);
+								toprowName.appendChild(toprowFormalalias);
 							}
-							element.appendChild(charName);
+							toprow.appendChild(toprowName);
 						}
+						toprowDiv.appendChild(toprow);
+						element.appendChild(toprowDiv);
+						const moreInfo = document.createElement("div");
+						moreInfo.setAttribute("class", "moreInfo");
+						moreInfo.hidden = true;
+						const moreInfoFlexbox = document.createElement("div");
+						moreInfoFlexbox.setAttribute("class", "moreInfoFlexbox");
+						const moreInfoDisplay = document.createElement("div");
+						moreInfoDisplay.setAttribute("class", "moreInfoDisplay");
+						moreInfoDisplay.appendChild(document.createTextNode(c));
+						moreInfoFlexbox.appendChild(moreInfoDisplay);
+						if (ci)
+						{
+							const moreInfoList = document.createElement("table");
+							moreInfoList.setAttribute("class", "moreInfoList");
+							const createRow = (label, info) => {
+								const row = document.createElement("tr");
+								const labelElement = document.createElement("th");
+								labelElement.appendChild(document.createTextNode(label));
+								const infoElement = document.createElement("td");
+								infoElement.appendChild(info);
+								row.appendChild(labelElement);
+								row.appendChild(infoElement);
+								moreInfoList.appendChild(row);
+							};
+							createRow("Name", document.createTextNode(ci["name"]));
+							moreInfoFlexbox.appendChild(moreInfoList);
+						}
+						moreInfo.appendChild(moreInfoFlexbox);
+						element.appendChild(moreInfo);
 						charinfo.appendChild(element);
 					}
 					document.getElementById("charinfoSection").hidden = text.length == 0;
