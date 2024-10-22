@@ -4,8 +4,13 @@
 		<title>Viklos RSS-test</title>
 		<description>Jag testar RSS</description>
 		<link>https://viklo.se/</link>
-		<pubDate>22 Oct 2024 19:03:00 +0000</pubDate>
-		<lastBuildDate>22 Oct 2024 19:03:00 +0000</lastBuildDate>
+		<pubDate>22 Oct 2024 19:08:00 +0000</pubDate>
+		<lastBuildDate>22 Oct 2024 19:08:00 +0000</lastBuildDate>
+		<item>
+			<title>Andra testet</title>
+			<description>Det andra testet.</description>
+			<pubDate>22 Oct 2024 19:08:00 +0000</pubDate>
+		</item>
 		<item>
 			<title>Första testet</title>
 			<description>Det första testet.</description>
